@@ -1,0 +1,160 @@
+﻿@layout LoginLayout
+@using System.Security.Cryptography;
+@page "/"
+@rendermode @(new InteractiveServerRenderMode(prerender: false)) 
+@inject IDataFlow DataAcessFlow
+@using ClientPortal.Models
+@using Newtonsoft.Json  \ 
+
+@using POD_App.Components.Layout
+@using POD_App.Models
+@using POD_App.Services
+@using System.IdentityModel.Tokens.Jwt
+@using System.Text
+@inject NavigationManager _manager;
+@inject Blazored.LocalStorage.ILocalStorageService SessionStorgaeData
+ @inject IJSRuntime JSRuntime
+
+  <div class="bg-gradient-primary">
+    <div class="container">
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                    </div>
+                                    
+                                        <div class="form-group">
+                                            <input type="email" class="form-control form-control-user"
+                                                   id="exampleInputEmail" aria-describedby="emailHelp"
+                                                   placeholder="Enter Username" @bind="Username">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control form-control-user"
+                                                   id="exampleInputPassword" placeholder="Password" @bind="Password">
+                                        </div>
+                                        <div class="form-group">
+                                            @* <div class="custom-control custom-checkbox small">
+                                                <input type="checkbox" class="custom-control-input" id="customCheck">
+                                                <label class="custom-control-label" for="customCheck">
+                                                    Remember
+                                                    Me
+                                                </label
+                                            </div> *@
+                                        </div>
+                                    <a href="" class="btn btn-primary btn-user btn-block" @onclick="Loginclick">
+                                            Login
+                                        </a>
+                                        
+                                   
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+@code {
+    LoginModel logindata = new LoginModel();
+    DataAcces dataAcess = new DataAcces();
+    public string Username { get; set; }
+    public string Password { get; set; }
+    private int currentCount = 0;
+    public string JWTokenData  { get; set; }
+    public string EncrptedClaim { get; set; }
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        
+
+        
+    }
+   
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Perform JavaScript interop calls here
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery/jquery.min.js");
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/bootstrap/js/bootstrap.bundle.min.js");
+
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery-easing/jquery.easing.min.js");
+
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/js/sb-admin-2.min.js");
+
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery/jquery.min.js");
+
+        }
+    }
+
+
+    public async void Loginclick()
+    {
+        if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+        {
+
+        }
+        else
+        {
+            logindata.Username = Username;
+            logindata.Password = Password;
+            var LoginRes = await DataAcessFlow.LoginAuth(logindata);
+            if (LoginRes.Status == true)
+          {
+                try
+                {
+                       
+                    BSessionDataM SessionDATA = new BSessionDataM();  
+                    string JWTokenData = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+
+                    // Decode the JWT
+                    var handler = new JwtSecurityTokenHandler();
+                    var jsonToken = handler.ReadToken(JWTokenData) as JwtSecurityToken;
+
+                    // Get the payload
+                    var payload = jsonToken?.Payload;
+
+                    // Serialize payload to JSON string
+                    string payloadJson = JsonConvert.SerializeObject(payload);
+
+                    // Deserialize to dynamic object
+                    var authenticateResult = JsonConvert.DeserializeObject<dynamic>(payloadJson);
+
+                    SessionDATA.Uname = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+                    await SessionStorgaeData.SetItemAsync("_SESSION_LOGAUTH_Datas", SessionDATA);
+                }
+                catch
+                {
+                    
+                }
+               
+                _manager.NavigateTo($"Index" ,true);
+            }
+
+        }
+
+     }
+}

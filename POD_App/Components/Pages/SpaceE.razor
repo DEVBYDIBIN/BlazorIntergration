@@ -1,0 +1,129 @@
+﻿@page "/SpaceE"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using POD_App.Models
+@using POD_App.Services
+@inject IDataFlow DataAcessFlow
+@inject Blazored.SessionStorage.ISessionStorageService SessionStorageData;
+@inject Blazored.LocalStorage.ILocalStorageService SessionStorgaeData_L
+@inject IJSRuntime jsRuntime
+<h3>Space Events</h3>
+<style>
+    .BodyT {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 70vh;
+        margin: 0;
+    }
+
+    .spinner-container {
+        text-align: center;
+    }
+</style>
+@if (Loading)
+{
+    <div class="BodyT">
+        <div class="spinner-container">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead style=" background-color:#858796;
+                       color: white;">
+                    <tr>
+                        @* <th>Sl.No</th> *@
+                        <th>Id</th>
+                        <th> Name</th>
+                        <th>Country_code</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th> Administrator</th>
+                        <th>Founding_year</th>
+                        <th>Launchers</th>
+                        <th>Spacecraft</th>
+                        <th> Image</th>
+                        <th>Logo</th>
+                        <th>Link</th>
+                        @* <th>Title</th>
+                    <th> Date</th>
+                    <th>Note</th>
+                    <th>Bunting</th> *@
+                        @*   <th> Population</th>
+                    <th>SlugNation</th> *@
+                        @*  <th>Invoice No</th>
+                    <th>Status</th>
+                    <th>Actions</th> *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var Pdata in LT_Uver.results)
+                    {
+                        <tr>
+                            @* <td>@Slono</td> *@
+                            <td>@Pdata.id</td>
+                            <td>@Pdata.name</td>
+                            <td>@Pdata.country_code</td>
+                            <td>@Pdata.type</td>                        
+                            <td>@Pdata.description</td>
+                            <td>@Pdata.administrator</td>
+                            <td>@Pdata.founding_year</td>
+                            <td>@Pdata.launchers</td>
+                            <td>@Pdata.spacecraft</td>
+                            <td>@Pdata.image_url</td>
+                            <td>@Pdata.logo_url</td>
+                            <td>@Pdata.url</td>
+                            @* <td>@Pdata.lRdate</td>
+                    <td>@Pdata.invoiceno</td>
+                    <td><span class="badge" style="background:rgb(52,195,143)"> @Pdata.status</span></td>
+                    <td></td> *@
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    List<USAPL>? LT_Univerty = new List<USAPL>();
+    BSessionDataM SessionDATA = new BSessionDataM();
+    SpaceEML LT_Uver = new SpaceEML();
+    public string? JWT { get; set; }
+    public bool Loading { get; set; } = true;
+    public int Slono { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var data = await SessionStorgaeData_L.GetItemAsync<BSessionDataM>("_SESSION_LOGAUTH_Datas");
+        JWT = data?.SessionToken;
+        LT_Uver = await DataAcessFlow.GetSpaceEvents();
+        if (LT_Univerty != null)
+        {
+            Loading = false;
+        }
+        StateHasChanged();
+    }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+
+
+    //         StateHasChanged();
+    //     }
+    // }
+}

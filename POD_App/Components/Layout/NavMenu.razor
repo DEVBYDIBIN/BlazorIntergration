@@ -1,0 +1,152 @@
+﻿@inject IJSRuntime JSRuntime
+@inject NavigationManager _manager;
+
+
+@* <div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">POD_App</a>
+    </div>
+</div> *@
+
+@* <input type="checkbox" title="Navigation menu" class="navbar-toggler" /> *@
+
+ <!-- Sidebar -->
+           <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="DasboardPod.aspx">
+                @* <div class="sidebar-brand-icon rotate-n-15">
+            <i class="POD"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3"> <sup></sup></div> *@
+              DEVBYDIBIN
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+        <a class="nav-link" href="Index" @onclick="DashboardC">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+
+                 <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+        Education
+            </div>
+
+          <li class="nav-item">
+        <a class="nav-link" href="University">
+            <i class="fas fa-gopuram"></i>
+            <span>Universitys</span>
+        </a>
+            </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Public
+    </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="SpaceE">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Space Events</span>
+        </a>
+    </li>
+
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Finance
+    </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="Cryptocurrency">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Crypto Details</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        World
+    </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="USA">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>USA Population</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="Holidays">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>UK Holidays</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="HongK">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Hong Kong</span>
+        </a>
+    </li>
+              
+
+          <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+         <!-- End of Sidebar -->
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public void DashboardC()
+    {
+        _manager.NavigateTo($"Index", true);
+    }
+    public void AandRclick()
+    {
+        _manager.NavigateTo($"App&Rejected", true);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Perform JavaScript interop calls here
+
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery/jquery.min.js");
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/bootstrap/js/bootstrap.bundle.min.js");
+
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery-easing/jquery.easing.min.js");
+
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/js/sb-admin-2.min.js");
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/js/sweetAlertInterop.js");
+            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery/jquery.min.js");
+
+        }
+    }
+
+}

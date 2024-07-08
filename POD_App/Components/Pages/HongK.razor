@@ -1,0 +1,116 @@
+﻿@page "/HongK"
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using POD_App.Models
+@using POD_App.Services
+@inject IDataFlow DataAcessFlow
+@inject Blazored.SessionStorage.ISessionStorageService SessionStorageData;
+@inject Blazored.LocalStorage.ILocalStorageService SessionStorgaeData_L
+@inject IJSRuntime jsRuntime
+<h3>Hong Kong Geo Data</h3>
+<style>
+    .BodyT {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 70vh;
+        margin: 0;
+    }
+
+    .spinner-container {
+        text-align: center;
+    }
+</style>
+@if (Loading)
+{
+    <div class="BodyT">
+        <div class="spinner-container">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead style=" background-color:#858796;
+                       color: white;">
+                    <tr>
+                        @* <th>Sl.No</th> *@
+                        <th>Address ZH</th>
+                        <th> Name ZH</th>
+                        <th>District ZH</th>                       
+                        <th>Name EN</th>
+                        <th>Address EN</th>
+                        <th>District EN</th>
+                        <th>X Code</th>
+                        <th> Y Code</th>
+                        @*  <th>Invoice No</th>
+                    <th>Status</th>
+                    <th>Actions</th> *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var Pdata in LT_Uver)
+                    {
+                        <tr>
+                            @* <td>@Slono</td> *@
+                            <td>@Pdata.addressZH</td>
+                            <td>@Pdata.nameZH</td>
+                            <td>@Pdata.districtZH</td>                         
+                            <td>@Pdata.nameEN</td>
+                            <td>@Pdata.addressEN</td>
+                            <td>@Pdata.districtEN</td>
+                            <td>@Pdata.x</td>
+                            <td>@Pdata.y</td>
+                            @*  <td>@Pdata.lRdate</td>
+                    <td>@Pdata.invoiceno</td>
+                    <td><span class="badge" style="background:rgb(52,195,143)"> @Pdata.status</span></td>
+                    <td></td> *@
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    List<HongKongM> LT_Uver = new List<HongKongM>();
+    BSessionDataM SessionDATA = new BSessionDataM();
+  
+    public string? JWT { get; set; }
+    public bool Loading { get; set; } = true;
+    public int Slono { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var data = await SessionStorgaeData_L.GetItemAsync<BSessionDataM>("_SESSION_LOGAUTH_Datas");
+        JWT = data?.SessionToken;
+        LT_Uver = await DataAcessFlow.GetHongKongD();
+        if (LT_Uver != null)
+        {
+            Loading = false;
+        }
+        StateHasChanged();
+    }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+
+
+    //         StateHasChanged();
+    //     }
+    // }
+}
