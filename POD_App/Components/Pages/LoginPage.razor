@@ -1,8 +1,10 @@
 ﻿@layout LoginLayout
 @using System.Security.Cryptography;
 @page "/"
-@rendermode @(new InteractiveServerRenderMode(prerender: false)) 
+ @implements IAsyncDisposable
+@rendermode InteractiveServer
 @inject IDataFlow DataAcessFlow
+
 @using ClientPortal.Models
 @using Newtonsoft.Json  \ 
 
@@ -59,6 +61,8 @@
                                    
                                    
                                 </div>
+                             
+
                             </div>
                         </div>
                     </div>
@@ -79,35 +83,56 @@
     private int currentCount = 0;
     public string JWTokenData  { get; set; }
     public string EncrptedClaim { get; set; }
+    private IJSObjectReference? module;
+    public async ValueTask DisposeAsync()
+    {
 
+        if (module is not null)
+        {
+            await module.DisposeAsync();
 
+        }
+
+    }
 
 
     protected override async Task OnInitializedAsync()
     {
 
-        
 
-        
+
+
     }
-   
+
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+
+        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./test.js");
+
+        // module= await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery/jquery.min.js");
+
+        // module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/bootstrap/js/bootstrap.bundle.min.js");
+
+        // module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery-easing/jquery.easing.min.js");
+
+        // module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/js/sb-admin-2.min.js");
+
+        // module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery/jquery.min.js");
+
+
+    }
+
+
+    public async void TestB()
+    {
+        if (module is not null)
         {
-            // Perform JavaScript interop calls here
-            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery/jquery.min.js");
-            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/bootstrap/js/bootstrap.bundle.min.js");
-
-            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery-easing/jquery.easing.min.js");
-
-            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/js/sb-admin-2.min.js");
-
-            await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/assets/vendor/jquery/jquery.min.js");
 
         }
+
+
     }
 
 
@@ -115,7 +140,7 @@
     {
         if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
         {
-
+            await module.InvokeVoidAsync("Showalert1", "Enter the Username and Password");
         }
         else
         {
@@ -123,10 +148,10 @@
             logindata.Password = Password;
             var LoginRes = await DataAcessFlow.LoginAuth(logindata);
             if (LoginRes.Status == true)
-          {
+            {
                 try
                 {
-                       
+
                     BSessionDataM SessionDATA = new BSessionDataM();  
                     string JWTokenData = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
@@ -148,10 +173,14 @@
                 }
                 catch
                 {
-                    
+
                 }
-               
+
                 _manager.NavigateTo($"Index" ,true);
+            }
+            else
+            {
+                await module.InvokeVoidAsync("Showalert1", "Invalid Credentials");
             }
 
         }
